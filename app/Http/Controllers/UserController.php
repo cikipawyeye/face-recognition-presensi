@@ -124,7 +124,7 @@ class UserController extends Controller
         ]);
 
         return redirect()
-            ->route('users.index')
-            ->with('success', __('app.deleted_data', ['data' => __('app.user')]));
+            ->route('users.show', $user)
+            ->with('success', __('app.updated_data', ['data' => __('app.user')]));
     }
 }

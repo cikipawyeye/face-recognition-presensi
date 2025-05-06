@@ -7,6 +7,7 @@ import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import Delete from './partials/Delete.vue';
 import Edit from './partials/Edit.vue';
+import ResetPassword from './partials/ResetPassword.vue';
 
 const props = defineProps<{
     user: User;
@@ -41,6 +42,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div class="flex items-center justify-between">
                             <h1 class="text-lg font-semibold">Admin Details</h1>
                             <div class="flex items-center gap-2">
+                                <ResetPassword :user="user" />
                                 <Edit :user="user" />
                                 <Delete :user="user" />
                             </div>

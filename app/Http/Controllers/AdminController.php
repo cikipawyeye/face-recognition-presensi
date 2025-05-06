@@ -90,14 +90,14 @@ class AdminController extends Controller
             ->with('success', __('app.deleted_data', ['data' => __('app.user')]));
     }
 
-    public function resetPassword(ResetPasswordRequest $request, User $user): RedirectResponse
+    public function resetPassword(ResetPasswordRequest $request, User $admin): RedirectResponse
     {
-        $user->update([
+        $admin->update([
             'password' => Hash::make($request->get('password')),
         ]);
 
         return redirect()
-            ->route('admins.index')
-            ->with('success', __('app.deleted_data', ['data' => __('app.user')]));
+            ->route('admins.show', $admin)
+            ->with('success', __('app.updated_data', ['data' => __('app.user')]));
     }
 }
