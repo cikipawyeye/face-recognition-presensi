@@ -28,6 +28,12 @@ const mainNavItems: NavItem[] = [
         permission: Permissions.MANAGE_USERS,
     },
     {
+        title: 'Attendance List',
+        href: '/user-attendances',
+        icon: Clock9Icon,
+        permission: Permissions.MANAGE_USER_ATTENDANCES,
+    },
+    {
         title: 'Presence',
         href: '/attendances/create',
         icon: Clock9Icon,

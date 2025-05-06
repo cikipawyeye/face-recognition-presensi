@@ -15,19 +15,15 @@ class AttendanceController extends Controller
      */
     public function index(Request $request)
     {
+        $query = Attendance::query()
+            ->userId($request->user()?->id)
+            ->latest();
+        $paginate = $request->boolean('paginate', true);
+
         return inertia('attendance/Index', [
-            'attendances' => Inertia::defer(function () use ($request) {
-                $data = Attendance::where('user_id', $request->user()?->id)
-                    ->latest()
-                    ->paginate(15)
-                    ->withQueryString();
-
-                $data->getCollection()->transform(function ($item) {
-                    return $item->append('time');
-                });
-
-                return $data;
-            }),
+            'attendances' => Inertia::defer(fn() => ! $paginate
+                ? $query->get()->each->append('time')
+                : $query->paginate()->through(fn($user) => $user->append('time'))->withQueryString()),
         ]);
     }
 

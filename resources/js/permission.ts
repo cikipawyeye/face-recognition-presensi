@@ -20,4 +20,10 @@ export const Permissions = {
   EDIT_ATTENDANCE: 'edit_attendance',
   ADD_ATTENDANCE: 'add_attendance',
   DELETE_ATTENDANCE: 'delete_attendance',
+  MANAGE_USER_ATTENDANCES: 'manage_user_attendances',
+  BROWSE_USER_ATTENDANCES: 'browse_user_attendances',
+  READ_USER_ATTENDANCE: 'read_user_attendance',
+  EDIT_USER_ATTENDANCE: 'edit_user_attendance',
+  ADD_USER_ATTENDANCE: 'add_user_attendance',
+  DELETE_USER_ATTENDANCE: 'delete_user_attendance',
 };

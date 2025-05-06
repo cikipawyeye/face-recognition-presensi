@@ -34,13 +34,21 @@ class PermissionAssignment
             P::ADD_USER => [R::SuperAdmin, R::Admin],
             P::DELETE_USER => [R::SuperAdmin, R::Admin],
 
-            // Attendance
-            P::MANAGE_ATTENDANCES => [R::User, R::SuperAdmin, R::Admin],
-            P::BROWSE_ATTENDANCES => [R::User, R::SuperAdmin, R::Admin],
-            P::READ_ATTENDANCE => [R::User, R::SuperAdmin, R::Admin],
+            // My attendance
+            P::MANAGE_ATTENDANCES => [R::User],
+            P::BROWSE_ATTENDANCES => [R::User],
+            P::READ_ATTENDANCE => [R::User],
             P::EDIT_ATTENDANCE => [R::User],
             P::ADD_ATTENDANCE => [R::User],
             P::DELETE_ATTENDANCE => [R::User],
+
+            // All user attendance
+            P::MANAGE_USER_ATTENDANCES => [R::SuperAdmin, R::Admin],
+            P::BROWSE_USER_ATTENDANCES => [R::SuperAdmin, R::Admin],
+            P::READ_USER_ATTENDANCE => [R::SuperAdmin, R::Admin],
+            P::EDIT_USER_ATTENDANCE => [R::SuperAdmin, R::Admin],
+            P::ADD_USER_ATTENDANCE => [R::SuperAdmin, R::Admin],
+            P::DELETE_USER_ATTENDANCE => [R::SuperAdmin, R::Admin],
         ];
     }
 

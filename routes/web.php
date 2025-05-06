@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\UserAttendanceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -29,4 +30,6 @@ Route::middleware(['auth', 'verified'])
         Route::resource('admins', AdminController::class);
         Route::post('admins/{admin}/reset-password', [AdminController::class, 'resetPassword'])
             ->name('admins.reset-password');
+
+        Route::resource('user-attendances', UserAttendanceController::class)->only(['index']);
     });

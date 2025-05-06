@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Heading from '@/components/Heading.vue';
 import Loader from '@/components/Loader.vue';
 import PaginationComponent from '@/components/Pagination.vue';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,10 +25,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <Head title="Presensi Saya" />
+     <AppLayout :breadcrumbs="breadcrumbs">
+        <Head title="Presensi Saya" />
 
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="p-4">
+        <div class="px-4 py-6">
+            <Heading title="Presensi Saya" description="Daftar kehadiran" />
+
             <Deferred :data="['attendances']">
                 <template #fallback>
                     <Loader />

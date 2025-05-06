@@ -25,11 +25,19 @@ class PermissionConstant extends Constant
     public const ADD_USER = 'add_user';
     public const DELETE_USER = 'delete_user';
 
-    // attendance
+    // my attendance
     public const MANAGE_ATTENDANCES = 'manage_attendances';
     public const BROWSE_ATTENDANCES = 'browse_attendances';
     public const READ_ATTENDANCE = 'read_attendance';
     public const EDIT_ATTENDANCE = 'edit_attendance';
     public const ADD_ATTENDANCE = 'add_attendance';
     public const DELETE_ATTENDANCE = 'delete_attendance';
+
+    // all user attendance
+    public const MANAGE_USER_ATTENDANCES = 'manage_user_attendances';
+    public const BROWSE_USER_ATTENDANCES = 'browse_user_attendances';
+    public const READ_USER_ATTENDANCE = 'read_user_attendance';
+    public const EDIT_USER_ATTENDANCE = 'edit_user_attendance';
+    public const ADD_USER_ATTENDANCE = 'add_user_attendance';
+    public const DELETE_USER_ATTENDANCE = 'delete_user_attendance';
 }

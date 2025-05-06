@@ -31,7 +31,7 @@ const filteredItems = computed(() => {
         <SidebarMenu>
             <SidebarMenuItem v-for="item in filteredItems" :key="item.title">
                 <SidebarMenuButton 
-                    as-child :is-active="item.href === page.url"
+                    as-child :is-active="item.href.startsWith(page.url)"
                     :tooltip="item.title"
                 >
                     <Link :href="item.href">
