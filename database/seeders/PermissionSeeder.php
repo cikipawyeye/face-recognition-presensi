@@ -17,8 +17,9 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('permissions')->truncate();
+        DB::table('model_has_permissions')->truncate();
         DB::table('role_has_permissions')->truncate();
+        DB::table('permissions')->truncate();
 
         $roleCount = count(\App\Enums\RoleEnum::cases());
         $assignments = collect(\App\PermissionAssignment::assignments());
