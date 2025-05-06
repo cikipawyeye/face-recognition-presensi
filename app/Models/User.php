@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, InteractsWithMedia;
+    use HasFactory, Notifiable, InteractsWithMedia, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -50,5 +55,40 @@ class User extends Authenticatable implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('face-reference');
+    }
+
+    public function userPermissions(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->getAllPermissions()
+                ->pluck('name')
+                ->toArray(),
+        );
+    }
+
+    public function role(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->roles->first()?->name,
+        );
+    }
+
+    public function roleTranslated(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->role ? RoleEnum::fromValue($this->role)->translated() : null,
+        );
+    }
+
+    #[Scope]
+    protected function search(Builder $query, ?string $keyword): void
+    {
+        if (empty($keyword)) {
+            return;
+        }
+        
+        $keyword = trim($keyword);
+        $query->where('name', 'like', sprintf('%%%s%%', $keyword))
+            ->orWhere('email', 'like', sprintf('%%%s%%', $keyword));
     }
 }

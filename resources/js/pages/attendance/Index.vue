@@ -3,6 +3,7 @@ import Loader from '@/components/Loader.vue';
 import PaginationComponent from '@/components/Pagination.vue';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { formatHumanDate } from '@/lib/helpers';
 import { Attendance, BreadcrumbItem, Pagination } from '@/types';
 import { Deferred, Head } from '@inertiajs/vue3';
 
@@ -39,12 +40,16 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <TableHeader>
                         <TableRow>
                             <TableHead> Date </TableHead>
+                            <TableHead> Check in </TableHead>
+                            <TableHead> Check out </TableHead>
                             <TableHead> Status </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <TableRow v-for="(item, index) in attendances.data" :key="index">
                             <TableCell>{{ item.time }}</TableCell>
+                            <TableCell>{{ item?.check_in ? formatHumanDate(item?.check_in) : '-' }}</TableCell>
+                            <TableCell>{{ item?.check_out ? formatHumanDate(item?.check_out) : '-' }}</TableCell>
                             <TableCell> {{ item.status }} </TableCell>
                         </TableRow>
                         <TableRow v-if="attendances.data.length < 1">

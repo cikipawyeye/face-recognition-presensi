@@ -21,7 +21,7 @@ export function ellipsis(str: string, maxLength: number = 50, suffix: string = '
     return str.length > maxLength ? str.slice(0, maxLength) + suffix : str;
 }
 
-export function formatHumanDate(date: string | Date, dateFormat = 'dd-LLL-yyyy') {
+export function formatHumanDate(date: string | Date, dateFormat = 'dd LLL yyyy, HH:mm') {
     return format(date instanceof Date ? date : new Date(date), dateFormat, { locale: id });
 }
 

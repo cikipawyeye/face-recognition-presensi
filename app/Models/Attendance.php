@@ -17,7 +17,7 @@ class Attendance extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id'];
+    protected $fillable = ['user_id', 'check_in', 'check_out'];
 
     protected function time(): Attribute
     {

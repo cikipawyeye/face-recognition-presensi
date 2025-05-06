@@ -1,11 +1,18 @@
 <script lang="ts" setup>
 import Loader from '@/components/Loader.vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem } from '@/types';
+import { formatHumanDate } from '@/lib/helpers';
+import { Attendance, BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/vue3';
+import { Rocket } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
+
+const props = defineProps<{
+    current: Attendance | null;
+}>();
 
 const video = ref<HTMLVideoElement | null>(null);
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -87,7 +94,8 @@ function base64ToFile(dataUrl: string, filename: string): File {
     return new File([u8arr], filename, { type: mime });
 }
 
-const form = useForm<{ photo: File | null }>({
+const form = useForm<{ photo: File | null; attendance_id: number | null }>({
+    attendance_id: props.current?.id ?? null,
     photo: null,
 });
 
@@ -133,6 +141,19 @@ onUnmounted(() => {
     <Head title="Attendance" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
+        <div v-if="current" class="flex w-full flex-col gap-4 px-2 py-4">
+            <Alert>
+                <Rocket class="h-4 w-4" />
+                <AlertTitle>Waktu Presensi Masuk: {{ current?.check_in ? formatHumanDate(current?.check_in) : '-' }}</AlertTitle>
+                <AlertDescription> Silahkan presensi untuk jam pulang. </AlertDescription>
+            </Alert>
+        </div>
+
+        <div class="text-center">
+            <p class="text-muted-foreground text-sm">Pastikan wajah Anda terlihat jelas dan tidak terhalang oleh objek lain.</p>
+            <p class="text-muted-foreground text-sm">Jika Anda tidak dapat mengambil gambar, silakan hubungi admin untuk bantuan lebih lanjut.</p>
+        </div>
+
         <canvas ref="canvas" width="300" height="225" style="display: none"></canvas>
 
         <div v-if="loadingCamera" class="m-auto flex aspect-video w-full px-2 py-4 md:w-[80%] xl:w-[70%]">
@@ -143,8 +164,6 @@ onUnmounted(() => {
             <video v-if="!photo" class="m-auto aspect-video w-full md:w-[80%] xl:w-[70%]" ref="video" autoplay playsinline></video>
             <img v-else :src="photo" class="m-auto aspect-video w-full object-contain md:w-[80%] xl:w-[70%]" alt="Hasil Gambar" />
         </div>
-
-        <br />
 
         <div v-if="!loadingCamera" class="flex px-4 py-4">
             <Button v-if="!photo" class="m-auto" @click="takePhoto">Ambil Gambar</Button>

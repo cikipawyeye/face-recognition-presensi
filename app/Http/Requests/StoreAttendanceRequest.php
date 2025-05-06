@@ -4,6 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @method string input(string $key, mixed $default = null)
+ * @method bool filled(string $key)
+ */
 class StoreAttendanceRequest extends FormRequest
 {
     /**
@@ -15,6 +19,7 @@ class StoreAttendanceRequest extends FormRequest
     {
         return [
             'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'attendance_id' => 'nullable|integer|exists:attendances,id',
         ];
     }
 }

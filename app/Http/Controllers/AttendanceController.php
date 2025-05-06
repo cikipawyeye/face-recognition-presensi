@@ -34,9 +34,11 @@ class AttendanceController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return inertia('attendance/Create');
+        return inertia('attendance/Create', [
+            'current' => Attendance::where('check_out', null)->where('user_id', $request->user()->id)->latest()->first(),
+        ]);
     }
 
     /**
@@ -67,7 +69,17 @@ class AttendanceController extends Controller
                 throw new \LogicException(isset($body['detail']) ? $body['detail'] : 'Pencocokan wajah gagal.');
             }
 
-            Attendance::create(['user_id' => $user->id]);
+            if ($request->filled('attendance_id')) {
+                $attendance = Attendance::where('id', $request->input('attendance_id'))->where('user_id', $user->id)->firstOrFail();
+                $attendance->update([
+                    'check_out' => now(),
+                ]);
+            } else {
+                Attendance::create([
+                    'user_id' => $user->id,
+                    'check_in' => now(),
+                ]);
+            }
 
             return redirect()
                 ->route('attendances.index')

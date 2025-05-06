@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,6 +19,14 @@ require __DIR__ . '/auth.php'; // NOSONAR
 
 Route::middleware(['auth', 'verified'])
     ->group(function () {
-        Route::resource('attendances', \App\Http\Controllers\AttendanceController::class)
+        Route::resource('attendances', AttendanceController::class)
             ->only(['index', 'create', 'store']);
+
+        Route::resource('users', UserController::class);
+        Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
+            ->name('users.reset-password');
+
+        Route::resource('admins', AdminController::class);
+        Route::post('admins/{admin}/reset-password', [AdminController::class, 'resetPassword'])
+            ->name('admins.reset-password');
     });

@@ -16,6 +16,8 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    role?: string;
+    permission?: string;
 }
 
 export interface SharedData extends PageProps {
@@ -35,6 +37,9 @@ export interface User {
     created_at: string;
     updated_at: string;
     attendance?: Attendance[];
+    role?: string;
+    role_translated?: string;
+    user_permissions?: string[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
@@ -59,6 +64,8 @@ export interface Attendance {
     id: number;
     user_id: number;
     status: 'present' | 'absent' | 'leave' | 'sick';
+    check_in: string | null;
+    check_out: string | null;
     created_at: string;
     updated_at: string;
     time?: string;
