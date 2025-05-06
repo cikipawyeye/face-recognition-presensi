@@ -17,9 +17,18 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('model_has_permissions')->truncate();
-        DB::table('role_has_permissions')->truncate();
-        DB::table('permissions')->truncate();
+        if (config('database.default') === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::table('model_has_permissions')->truncate();
+            DB::table('role_has_permissions')->truncate();
+            DB::table('permissions')->truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } else {
+            DB::table('model_has_permissions')->truncate();
+            DB::table('role_has_permissions')->truncate();
+            DB::table('permissions')->truncate();
+        }
+
 
         $roleCount = count(\App\Enums\RoleEnum::cases());
         $assignments = collect(\App\PermissionAssignment::assignments());
@@ -29,7 +38,7 @@ class PermissionSeeder extends Seeder
 
         $assignments->chunk(20)->each(function ($chunk) {
             DB::transaction(function () use ($chunk) {
-                $chunk->each(fn ($roles, $permission) => $this->savePermission($permission, $roles));
+                $chunk->each(fn($roles, $permission) => $this->savePermission($permission, $roles));
             });
         });
 
@@ -40,7 +49,7 @@ class PermissionSeeder extends Seeder
     {
         $permission = Permission::firstOrCreate(['name' => $index]);
 
-        collect($roles)->each(fn ($role) => $this->givePermission($role, $permission));
+        collect($roles)->each(fn($role) => $this->givePermission($role, $permission));
     }
 
     private function givePermission($role, $permission): void
