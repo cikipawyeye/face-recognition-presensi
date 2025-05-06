@@ -26,6 +26,8 @@ Route::middleware(['auth', 'verified'])
         Route::resource('users', UserController::class);
         Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
             ->name('users.reset-password');
+        Route::post('users/{user}/update-photos', [UserController::class, 'updatePhotos'])
+            ->name('users.update-photos');
 
         Route::resource('admins', AdminController::class);
         Route::post('admins/{admin}/reset-password', [AdminController::class, 'resetPassword'])

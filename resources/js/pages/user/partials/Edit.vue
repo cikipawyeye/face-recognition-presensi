@@ -48,7 +48,7 @@ const closeModal = () => {
 <template>
     <Dialog v-model:open="open">
         <DialogTrigger as-child>
-            <Button> <Pen class="-ms-1" /> Edit User </Button>
+            <Button variant="outline"> <Pen class="-ms-1" /> Edit User </Button>
         </DialogTrigger>
         <DialogContent>
             <form class="space-y-6" @submit="submit">

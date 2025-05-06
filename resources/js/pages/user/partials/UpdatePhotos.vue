@@ -14,10 +14,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User } from '@/types';
-import { Key } from 'lucide-vue-next';
+import { FilePondFile } from 'filepond';
+import { ImageIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -26,17 +26,15 @@ const props = defineProps<{
 
 const open = ref(false);
 const form = useForm<{
-    password: string;
-    password_confirmation: string;
+    photos: (File | Blob)[] | null;
 }>({
-    password: '',
-    password_confirmation: '',
+    photos: null,
 });
 
 const submit = (e: Event) => {
     e.preventDefault();
 
-    form.post(route('users.reset-password', props.user.id), {
+    form.post(route('users.update-photos', props.user.id), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
     });
@@ -47,38 +45,43 @@ const closeModal = () => {
     form.reset();
     open.value = false;
 };
+
+const updateFiles = (fileItems: FilePondFile[]) => {
+    form.photos = fileItems.map((fileItem) => fileItem.file as File | Blob) ?? null;
+};
 </script>
 
 <template>
     <Dialog v-model:open="open">
         <DialogTrigger as-child>
-            <Button variant="outline"> <Key class="-ms-1" /> Reset Password </Button>
+            <Button variant="outline"> <ImageIcon class="-ms-1" /> Change Photos </Button>
         </DialogTrigger>
         <DialogContent>
             <form class="space-y-6" @submit="submit">
                 <DialogHeader class="space-y-3">
-                    <DialogTitle>Reset User Password</DialogTitle>
+                    <DialogTitle>Change User Photos</DialogTitle>
                     <DialogDescription> </DialogDescription>
                 </DialogHeader>
 
                 <div class="">
                     <div class="mb-6 grid gap-2">
-                        <Label for="password">New password</Label>
-                        <Input id="password" class="mt-1 block w-full" v-model="form.password" required placeholder="Password" type="password" />
-                        <InputError class="mt-1" :message="form.errors.password" />
-                    </div>
-
-                    <div class="mb-6 grid gap-2">
-                        <Label for="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            class="mt-1 block w-full"
-                            v-model="form.password_confirmation"
-                            required
-                            placeholder="Confirm password"
-                            type="password"
-                        />
-                        <InputError class="mt-1" :message="form.errors.password_confirmation" />
+                        <Label for="">Photos</Label>
+                        <div class="mt-1 block w-full">
+                            <file-pond
+                                label-idle="Drop file here..."
+                                :allow-multiple="true"
+                                :storeAsFile="true"
+                                accepted-file-types="image/jpeg,image/png,image/jpg"
+                                max-file-size="5MB"
+                                @updatefiles="updateFiles"
+                                :files="user.photo_urls"
+                                imagePreviewMaxHeight="200"
+                            />
+                        </div>
+                        <InputError class="mt-1" :message="form.errors.photos" />
+                        <InputError class="mt-2" :message="(form.errors as any)['photos.0']?.replace('photos.0', 'photo 1')" />
+                        <InputError class="mt-2" :message="(form.errors as any)['photos.1']?.replace('photos.1', 'photo 2')" />
+                        <InputError class="mt-2" :message="(form.errors as any)['photos.2']?.replace('photos.2', 'photo 3')" />
                     </div>
                 </div>
 

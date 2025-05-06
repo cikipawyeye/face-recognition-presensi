@@ -6,6 +6,7 @@ use App\Constants\PermissionConstant as Permission;
 use App\Enums\RoleEnum;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SaveUserRequest;
+use App\Http\Requests\Settings\PhotoUpdateRequest;
 use App\Http\Services\FaceRecognitionService;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class UserController extends Controller
 {
@@ -52,37 +54,39 @@ class UserController extends Controller
      */
     public function store(SaveUserRequest $request): RedirectResponse
     {
-        $user = User::create($request->validated());
-        $user->assignRole(RoleEnum::User->value);
-
-        $photos = collect($request->file('photos'));
-
         try {
-            $photos->each(function (UploadedFile $photo, $index) {
-                /** @disregard */
-                $response = FaceRecognitionService::checkFacePresence($photo);
-                $body = $response->json();
-    
-                if (!$response->successful()) {
-                    $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
-    
-                    throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
-                }
+            $user = DB::transaction(function () use ($request) {
+                $user = User::create($request->validated());
+                $user->assignRole(RoleEnum::User->value);
+
+                $photos = collect($request->file('photos'));
+
+                $photos->each(function (UploadedFile $photo, $index) {
+                    /** @disregard */
+                    $response = FaceRecognitionService::checkFacePresence($photo);
+                    $body = $response->json();
+
+                    if (!$response->successful()) {
+                        $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
+
+                        throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
+                    }
+                });
+
+                $photos->each(fn(UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));
+
+                return $user;
             });
-    
-            DB::transaction(function () use ($photos, $user) {
-                $photos->each(fn (UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));
-            });
+
+            return redirect()
+                ->route('users.show', $user)
+                ->with('success', __('app.created_data', ['data' => __('app.user')]));
         } catch (\Throwable $th) {
             return back()
                 ->withErrors([
                     'photos' => $th->getMessage() . ' Silahkan masukkan ulang.'
                 ]);
         }
-
-        return redirect()
-            ->route('users.show', $user)
-            ->with('success', __('app.created_data', ['data' => __('app.user')]));
     }
 
     /**
@@ -100,8 +104,10 @@ class UserController extends Controller
      */
     public function update(SaveUserRequest $request, User $user): RedirectResponse
     {
-        $user->update($request->only('name', 'email'));
-        $user->assignRole(RoleEnum::User->value);
+        DB::transaction(function () use ($request, $user) {
+            $user->update($request->only('name', 'email'));
+            $user->assignRole(RoleEnum::User->value);
+        });
 
         return redirect()
             ->route('users.show', $user)
@@ -126,5 +132,44 @@ class UserController extends Controller
         return redirect()
             ->route('users.show', $user)
             ->with('success', __('app.updated_data', ['data' => __('app.user')]));
+    }
+
+    public function updatePhotos(PhotoUpdateRequest $request, User $user): RedirectResponse
+    {
+        $existingMedia = $user->getMedia('face-reference');
+
+        /** @disregard P1013 */
+        $photos = collect($request->file('photos'));
+
+        try {
+            $photos->each(function (UploadedFile $photo, $index) {
+                /** @disregard */
+                $response = FaceRecognitionService::checkFacePresence($photo);
+                $body = $response->json();
+
+                if (!$response->successful()) {
+                    $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
+
+                    throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
+                }
+            });
+
+            DB::transaction(function () use ($photos, $user, $existingMedia) {
+                $photos->each(fn(UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));
+
+                if ($existingMedia->isNotEmpty()) {
+                    $existingMedia->each(fn(Media $media) => $media->forceDelete());
+                }
+            });
+
+            return redirect()
+                ->route('users.show', $user)
+                ->with('success', __('app.updated_data', ['data' => __('app.user')]));
+        } catch (\Throwable $th) {
+            return back()
+                ->withErrors([
+                    'photos' => $th->getMessage() . ' Silahkan masukkan ulang.'
+                ]);
+        }
     }
 }
