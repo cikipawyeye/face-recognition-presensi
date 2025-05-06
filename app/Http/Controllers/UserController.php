@@ -25,7 +25,7 @@ class UserController extends Controller
         $this->middleware(sprintf('permission:%s', Permission::BROWSE_USERS))->only('index');
         $this->middleware(sprintf('permission:%s', Permission::READ_USER))->only('show');
         $this->middleware(sprintf('permission:%s', Permission::ADD_USER))->only('store');
-        $this->middleware(sprintf('permission:%s', Permission::EDIT_USER))->only('update');
+        $this->middleware(sprintf('permission:%s', Permission::EDIT_USER))->only(['update', 'resetPassword', 'updatePhotos']);
         $this->middleware(sprintf('permission:%s', Permission::DELETE_USER))->only('destroy');
     }
 

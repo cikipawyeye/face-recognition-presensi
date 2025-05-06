@@ -20,7 +20,7 @@ class AdminController extends Controller
         $this->middleware(sprintf('permission:%s', Permission::BROWSE_ADMINS))->only('index');
         $this->middleware(sprintf('permission:%s', Permission::READ_ADMIN))->only('show');
         $this->middleware(sprintf('permission:%s', Permission::ADD_ADMIN))->only('store');
-        $this->middleware(sprintf('permission:%s', Permission::EDIT_ADMIN))->only('update');
+        $this->middleware(sprintf('permission:%s', Permission::EDIT_ADMIN))->only(['update', 'resetPassword']);
         $this->middleware(sprintf('permission:%s', Permission::DELETE_ADMIN))->only('destroy');
     }
 
