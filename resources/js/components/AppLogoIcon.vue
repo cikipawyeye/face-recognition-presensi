@@ -14,5 +14,5 @@ defineProps<Props>();
 </script>
 
 <template>
-    <ScanFace class="text-white dark:text-black" />
+    <ScanFace :class="className" />
 </template>
