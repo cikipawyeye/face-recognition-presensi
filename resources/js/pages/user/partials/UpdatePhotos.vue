@@ -34,8 +34,17 @@ const form = useForm<{
 const submit = (e: Event) => {
     e.preventDefault();
 
+    form.photos?.forEach((file, index) => {
+        if (form.photos && file instanceof Blob) {
+            form.photos[index] = new File([file], (file as File).name, { type: file.type });
+        }
+    });
+    
     form.post(route('users.update-photos', props.user.id), {
         preserveScroll: true,
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
         onSuccess: () => closeModal(),
     });
 };

@@ -40,9 +40,9 @@ const breadcrumbs: BreadcrumbItem[] = [
             <div class="mt-7 overflow-x-auto">
                 <Card class="">
                     <CardHeader>
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
                             <h1 class="text-lg font-semibold">User Details</h1>
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <ResetPassword :user="user" />
                                 <UpdatePhotos :user="user" />
                                 <Edit :user="user" />
