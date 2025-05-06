@@ -11,7 +11,7 @@ const props = defineProps<{
 const page = usePage<SharedData>();
 
 const filteredItems = computed(() => {
-    return props.items.filter(item => {
+    return props.items.filter((item) => {
         if (item.role) {
             return page.props.auth.user?.role == item.role;
         }
@@ -30,8 +30,9 @@ const filteredItems = computed(() => {
         <SidebarGroupLabel>Platform</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in filteredItems" :key="item.title">
-                <SidebarMenuButton 
-                    as-child :is-active="item.href.startsWith(page.url)"
+                <SidebarMenuButton
+                    as-child
+                    :is-active="item.href.startsWith('/attendances') ? item.href == page.url : item.href.startsWith(page.url)"
                     :tooltip="item.title"
                 >
                     <Link :href="item.href">

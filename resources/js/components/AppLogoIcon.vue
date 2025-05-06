@@ -14,5 +14,5 @@ defineProps<Props>();
 </script>
 
 <template>
-    <ScanFace :class="className" />
+    <ScanFace :class="className" v-bind="$attrs" />
 </template>
