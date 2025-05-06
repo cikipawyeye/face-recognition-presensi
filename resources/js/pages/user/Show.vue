@@ -5,8 +5,8 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { formatHumanDate } from '@/lib/helpers';
 import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import Edit from './partials/Edit.vue';
 import Delete from './partials/Delete.vue';
+import Edit from './partials/Edit.vue';
 
 const props = defineProps<{
     user: User;
@@ -59,6 +59,17 @@ const breadcrumbs: BreadcrumbItem[] = [
                             <div class="flex-1">
                                 <h2 class="font-semibold">Registered at</h2>
                                 <p>{{ formatHumanDate(user.created_at, 'dd LLL yyyy, HH:mm') }}</p>
+                            </div>
+                            <div class="flex-1">
+                                <h2 class="font-semibold">Photos</h2>
+                                <div class="flex gap-2">
+                                    <a v-for="(photo, index) in user.photo_urls" :key="index" :href="photo" target="_blank">
+                                        <img :src="photo" alt="User Photo" class="h-16 w-16 rounded-md object-cover" />
+                                    </a>
+                                    <p v-if="!user.photo_urls || user.photo_urls.length < 1">
+                                        <span class="text-gray-500">No photos available</span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </CardContent>

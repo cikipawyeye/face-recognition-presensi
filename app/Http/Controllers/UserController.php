@@ -6,9 +6,12 @@ use App\Constants\PermissionConstant as Permission;
 use App\Enums\RoleEnum;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SaveUserRequest;
+use App\Http\Services\FaceRecognitionService;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -52,6 +55,31 @@ class UserController extends Controller
         $user = User::create($request->validated());
         $user->assignRole(RoleEnum::User->value);
 
+        $photos = collect($request->file('photos'));
+
+        try {
+            $photos->each(function (UploadedFile $photo, $index) {
+                /** @disregard */
+                $response = FaceRecognitionService::checkFacePresence($photo);
+                $body = $response->json();
+    
+                if (!$response->successful()) {
+                    $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
+    
+                    throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
+                }
+            });
+    
+            DB::transaction(function () use ($photos, $user) {
+                $photos->each(fn (UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));
+            });
+        } catch (\Throwable $th) {
+            return back()
+                ->withErrors([
+                    'photos' => $th->getMessage() . ' Silahkan masukkan ulang.'
+                ]);
+        }
+
         return redirect()
             ->route('users.show', $user)
             ->with('success', __('app.created_data', ['data' => __('app.user')]));
@@ -63,7 +91,7 @@ class UserController extends Controller
     public function show(User $user): Response
     {
         return inertia('user/Show', [
-            'user' => $user,
+            'user' => $user->append('photo_urls'),
         ]);
     }
 

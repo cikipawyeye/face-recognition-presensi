@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
  * @property \App\Models\User|null $user
  * @method string input()
  * @method array only()
+ * @method array<\Illuminate\Http\UploadedFile> file()
  */
 class SaveUserRequest extends FormRequest
 {
@@ -25,6 +26,8 @@ class SaveUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $this->user?->id,
             'password' => ['nullable','string','min:8','confirmed', Rule::requiredIf(!$this->user?->id)],
+            'photos' => ['required', 'array', 'max:3', 'min:1', Rule::requiredIf(!$this->user?->id)],
+            'photos.*' => ['required', 'image', 'extensions:jpeg,png,jpg,webp', 'mimes:jpeg,png,jpg,webp', 'max:5120']
         ];
     }
 }

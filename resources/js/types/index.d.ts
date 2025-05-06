@@ -40,6 +40,7 @@ export interface User {
     role?: string;
     role_translated?: string;
     user_permissions?: string[];
+    photo_urls?: string[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

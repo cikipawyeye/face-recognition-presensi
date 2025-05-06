@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasMedia
@@ -77,6 +78,13 @@ class User extends Authenticatable implements HasMedia
     {
         return Attribute::make(
             get: fn() => $this->role ? RoleEnum::fromValue($this->role)->translated() : null,
+        );
+    }
+
+    public function photoUrls(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->getMedia('face-reference')->map(fn (Media $media) => $media->getFullUrl()),
         );
     }
 
