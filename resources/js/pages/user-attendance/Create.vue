@@ -21,11 +21,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Attendances',
-        href: '/attendances',
+        href: '/user-attendances',
     },
     {
         title: 'Create',
-        href: '/attendances/create',
+        href: '/user-attendances/create',
     },
 ];
 

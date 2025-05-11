@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\PermissionConstant as Permission;
 use App\Http\Requests\StoreAttendanceRequest;
 use App\Http\Services\FaceRecognitionService;
 use App\Models\Attendance;
@@ -10,6 +11,12 @@ use Inertia\Inertia;
 
 class AttendanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(sprintf('permission:%s', Permission::BROWSE_ATTENDANCES))->only('index');
+        $this->middleware(sprintf('permission:%s', Permission::ADD_ATTENDANCE))->only(['create', 'store']);
+    }
+
     /**
      * Display a listing of the resource.
      */
