@@ -64,9 +64,14 @@ export interface Pagination<T = any> {
 export interface Attendance {
     id: number;
     user_id: number;
+    date: string;
     status: 'present' | 'absent' | 'leave' | 'sick';
     check_in: string | null;
     check_out: string | null;
+    check_in_photo_distance: number | null;
+    check_out_photo_distance: number | null;
+    check_in_photo_url?: string | null;
+    check_out_photo_url?: string | null;
     created_at: string;
     updated_at: string;
     time?: string;

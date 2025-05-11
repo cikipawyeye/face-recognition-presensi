@@ -10,8 +10,9 @@ from concurrent.futures import ThreadPoolExecutor
 app = FastAPI()
 
 MODEL_NAME = "Facenet512"
+# MODEL_NAME = "ArcFace"
 DETECTOR_BACKEND = "opencv"
-THRESHOLD = 0.4
+THRESHOLD = 0.5
 
 def is_face_present(image_path: str) -> bool:
     try:
@@ -24,7 +25,7 @@ def is_face_present(image_path: str) -> bool:
         return False
 
 def get_embedding(path: str) -> List[float]:
-    return DeepFace.represent(img_path=path, model_name=MODEL_NAME, detector_backend=DETECTOR_BACKEND, enforce_detection=True)[0]["embedding"]
+    return DeepFace.represent(img_path=path, model_name=MODEL_NAME, detector_backend=DETECTOR_BACKEND, enforce_detection=False)[0]["embedding"]
 
 def save_upload(file: UploadFile) -> str:
     path = f"temp_{uuid4().hex}_{file.filename}"
@@ -68,12 +69,11 @@ async def verify_face(
 
     try:
         # Validasi wajah pada kedua gambar
-        if not is_face_present(input_path):
-            raise HTTPException(status_code=400, detail="Foto tidak mengandung wajah/tidak jelas.")
-
-        for filename in ref_paths:
-            if not is_face_present(filename):
-                raise HTTPException(status_code=400, detail="Foto profil user tidak mengandung wajah/tidak jelas.")
+        # if not is_face_present(input_path):
+        #     raise HTTPException(status_code=400, detail="Foto tidak mengandung wajah/tidak jelas.")
+        # for filename in ref_paths:
+        #     if not is_face_present(filename):
+        #         raise HTTPException(status_code=400, detail="Foto profil user tidak mengandung wajah/tidak jelas.")
 
         input_embedding = get_embedding(input_path)
 
@@ -82,14 +82,13 @@ async def verify_face(
             dist = cosine(input_embedding, ref_embedding)
             return dist, ref_path
 
-        with ThreadPoolExecutor() as executor:
-            results = executor.map(process_reference, ref_paths)
+        results = map(process_reference, ref_paths)
 
         for distance, ref_path in results:
             if distance < THRESHOLD:
                 return {"verified": True, "distance": distance}
 
-        return {"verified": False, "detail": "Wajah tidak cocok"}
+        return {"verified": False, "distance": distance, "detail": "Wajah tidak cocok"}
 
     except HTTPException as he:
         raise he

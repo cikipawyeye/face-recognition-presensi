@@ -33,5 +33,6 @@ Route::middleware(['auth', 'verified'])
         Route::post('admins/{admin}/reset-password', [AdminController::class, 'resetPassword'])
             ->name('admins.reset-password');
 
-        Route::resource('user-attendances', UserAttendanceController::class)->only(['index']);
+        Route::resource('user-attendances', UserAttendanceController::class)->only(['index', 'create', 'store', 'show']);
+        Route::post('user-attendances/{user_attendance}/validate', [UserAttendanceController::class, 'validate'])->name('user-attendances.validate');
     });
