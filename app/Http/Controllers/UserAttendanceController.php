@@ -56,7 +56,7 @@ class UserAttendanceController extends Controller
         /** @var \App\Models\User $user */
         $user = User::findOrFail($request->input('user_id'));
 
-        DB::transaction(function () use ($request, $user) {
+        $attendance = DB::transaction(function () use ($request, $user) {
             /** @var Attendance */
             $attendance = Attendance::create([
                 'user_id' => $user->id,
@@ -74,10 +74,12 @@ class UserAttendanceController extends Controller
                 $attendance->addMedia($request->file('check_out_photo'))
                     ->toMediaCollection('check-out-photo');
             }
+
+            return $attendance;
         });
 
         return redirect()
-            ->route('user-attendances.index')
+            ->route('user-attendances.show', $attendance)
             ->with('success', 'Attendance created successfully.');
     }
 
