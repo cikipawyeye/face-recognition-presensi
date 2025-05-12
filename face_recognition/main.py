@@ -5,7 +5,8 @@ import os
 from uuid import uuid4
 from typing import List
 from scipy.spatial.distance import cosine
-from concurrent.futures import ThreadPoolExecutor
+import cv2
+import numpy as np
 
 app = FastAPI()
 
@@ -24,14 +25,62 @@ def is_face_present(image_path: str) -> bool:
     except Exception:
         return False
 
-def get_embedding(path: str) -> List[float]:
-    return DeepFace.represent(img_path=path, model_name=MODEL_NAME, detector_backend=DETECTOR_BACKEND, enforce_detection=False)[0]["embedding"]
-
 def save_upload(file: UploadFile) -> str:
     path = f"temp_{uuid4().hex}_{file.filename}"
     with open(path, "wb") as f:
         shutil.copyfileobj(file.file, f)
     return path
+
+def rotate_image(image: np.ndarray, angle: int) -> np.ndarray:
+    if angle == 90:
+        return cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    elif angle == 180:
+        return cv2.rotate(image, cv2.ROTATE_180)
+    elif angle == 270:
+        return cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    else:
+        return image
+
+def try_rotations_for_embedding(image_path: str) -> List[float]:
+    original = cv2.imread(image_path)
+    rotations = [90, 180, 270]
+    last_exception = None
+
+    # Coba rotasi 90, 180, 270
+    for angle in rotations:
+        rotated = rotate_image(original, angle)
+        temp_rotated_path = f"{image_path}_rotated_{angle}.jpg"
+        cv2.imwrite(temp_rotated_path, rotated)
+
+        try:
+            embedding = DeepFace.represent(
+                img_path=temp_rotated_path,
+                model_name=MODEL_NAME,
+                detector_backend=DETECTOR_BACKEND,
+                enforce_detection=True
+            )[0]["embedding"]
+
+            os.remove(temp_rotated_path)
+            return embedding
+
+        except Exception as e:
+            last_exception = e
+            os.remove(temp_rotated_path)
+            continue
+
+    # Fallback: coba gambar original meskipun enforce_detection=False
+    try:
+        embedding = DeepFace.represent(
+            img_path=image_path,
+            model_name=MODEL_NAME,
+            detector_backend=DETECTOR_BACKEND,
+            enforce_detection=False
+        )[0]["embedding"]
+        return embedding
+
+    except Exception as e:
+        raise Exception(f"Gagal mendeteksi wajah dari semua rotasi dan gambar asli: {str(last_exception or e)}")
+
     
 @app.post("/check-face-presence")
 async def check_face_presence(image: UploadFile = File(...)):
@@ -75,10 +124,10 @@ async def verify_face(
         #     if not is_face_present(filename):
         #         raise HTTPException(status_code=400, detail="Foto profil user tidak mengandung wajah/tidak jelas.")
 
-        input_embedding = get_embedding(input_path)
+        input_embedding = try_rotations_for_embedding(input_path)
 
         def process_reference(ref_path):
-            ref_embedding = get_embedding(ref_path)
+            ref_embedding = try_rotations_for_embedding(ref_path)
             dist = cosine(input_embedding, ref_embedding)
             return dist, ref_path
 

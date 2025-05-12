@@ -6,3 +6,4 @@ deepface
 opencv-python
 python-multipart
 scipy
+numpy
