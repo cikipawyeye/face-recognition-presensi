@@ -59,21 +59,21 @@ class UserController extends Controller
                 $user = User::create($request->validated());
                 $user->assignRole(RoleEnum::User->value);
 
-                $photos = collect($request->file('photos'));
-
-                $photos->each(function (UploadedFile $photo, $index) {
-                    /** @disregard */
-                    $response = FaceRecognitionService::checkFacePresence($photo);
-                    $body = $response->json();
-
-                    if (!$response->successful()) {
-                        $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
-
-                        throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
-                    }
-                });
-
-                $photos->each(fn(UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));
+                $files = $request->file('photos');
+                if (! empty($files)) {
+                    $photos = collect($request->file('photos'));
+                    $photos->each(function (UploadedFile $photo, $index) {
+                        /** @disregard */
+                        $response = FaceRecognitionService::checkFacePresence($photo);
+                        $body = $response->json();
+    
+                        if (!$response->successful()) {
+                            $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
+                            throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
+                        }
+                    });
+                    $photos->each(fn(UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));
+                }
 
                 return $user;
             });
@@ -142,17 +142,16 @@ class UserController extends Controller
         $photos = collect($request->file('photos'));
 
         try {
-            $photos->each(function (UploadedFile $photo, $index) {
-                /** @disregard */
-                $response = FaceRecognitionService::checkFacePresence($photo);
-                $body = $response->json();
-
-                if (!$response->successful()) {
-                    $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
-
-                    throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
-                }
-            });
+            // Uncomment the following lines if you want to enforce face presence check
+            // $photos->each(function (UploadedFile $photo, $index) {
+            //     /** @disregard */
+            //     $response = FaceRecognitionService::checkFacePresence($photo);
+            //     $body = $response->json();
+            //     if (!$response->successful()) {
+            //         $message = isset($body['detail']) ? $body['detail'] : 'Failed to detect face.';
+            //         throw new \LogicException('Gambar ' . ($index + 1) . ': ' . $message);
+            //     }
+            // });
 
             DB::transaction(function () use ($photos, $user, $existingMedia) {
                 $photos->each(fn(UploadedFile $photo) => $user->addMedia($photo)->toMediaCollection('face-reference', 'public'));

@@ -10,10 +10,11 @@ const sidebarNavItems: NavItem[] = [
         title: 'Profile',
         href: '/settings/profile',
     },
-    {
-        title: 'Photos',
-        href: '/settings/photos',
-    },
+    // User photos for face reference, can be enabled later
+    // {
+    //     title: 'Photos',
+    //     href: '/settings/photos',
+    // },
     {
         title: 'Password',
         href: '/settings/password',

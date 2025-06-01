@@ -79,25 +79,37 @@ const updateFiles = (fileItems: FilePondFile[]) => {
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <div class="mb-6 grid gap-2">
-                            <Label for="name">Name</Label>
+                            <div class="flex justify-between">
+                                <Label for="name">Name</Label>
+                                <span class="text-xs text-destructive">*required</span>
+                            </div>
                             <Input id="name" class="mt-1 block w-full" v-model="form.name" required placeholder="Full name" type="text" />
                             <InputError class="mt-1" :message="form.errors.name" />
                         </div>
 
                         <div class="mb-6 grid gap-2">
-                            <Label for="email">Email</Label>
+                            <div class="flex justify-between">
+                                <Label for="email">Email</Label>
+                                <span class="text-xs text-destructive">*required</span>
+                            </div>
                             <Input id="email" class="mt-1 block w-full" v-model="form.email" required placeholder="test@example.com" type="text" />
                             <InputError class="mt-1" :message="form.errors.email" />
                         </div>
 
                         <div class="mb-6 grid gap-2">
-                            <Label for="password">Password</Label>
+                            <div class="flex justify-between">
+                                <Label for="password">Password</Label>
+                                <span class="text-xs text-destructive">*required</span>
+                            </div>
                             <Input id="password" class="mt-1 block w-full" v-model="form.password" required placeholder="Password" type="password" />
                             <InputError class="mt-1" :message="form.errors.password" />
                         </div>
 
                         <div class="mb-6 grid gap-2">
-                            <Label for="password_confirmation">Confirm password</Label>
+                            <div class="flex justify-between">
+                                <Label for="password_confirmation">Confirm password</Label>
+                                <span class="text-xs text-destructive">*required</span>
+                            </div>
                             <Input
                                 id="password_confirmation"
                                 class="mt-1 block w-full"
